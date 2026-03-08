@@ -453,8 +453,8 @@ function renderGrid() {
   }
   let html = '<div class="grid">';
   for (const p of products) {
-    const img = p.has_photo
-      ? `<img class="card-img" src="${API}/api/photo/${p.id}" alt="" loading="lazy">`
+    const img = p.photo_url
+      ? `<img class="card-img" src="${p.photo_url}" alt="" loading="lazy">`
       : `<div class="card-placeholder">👔</div>`;
     html += `<div class="card" data-id="${p.id}">${img}<div class="card-body"><div class="card-name">${esc(p.name)}</div><div class="card-price">${fmtPrice(p.price)} ₽</div></div></div>`;
   }
@@ -472,8 +472,8 @@ function renderProductModal() {
   const p = currentProduct;
   if (!p) return;
   selectedSize = '';
-  const img = p.has_photo
-    ? `<img class="detail-img" src="${API}/api/photo/${p.id}" alt="">`
+  const img = p.photo_url
+    ? `<img class="detail-img" src="${p.photo_url}" alt="">`
     : `<div class="detail-placeholder">👔</div>`;
 
   const sizes = (p.sizes || '').split(',').map(s => s.trim()).filter(Boolean);
@@ -523,8 +523,8 @@ function renderCartModal() {
   for (const it of cart) {
     const sub = it.price * it.quantity;
     total += sub;
-    const img = it.has_photo
-      ? `<img class="cart-item-img" src="${API}/api/photo/${it.product_id}" alt="">`
+    const img = it.photo_url
+      ? `<img class="cart-item-img" src="${it.photo_url}" alt="">`
       : `<div class="cart-item-placeholder">👔</div>`;
     const sizeLabel = it.size && it.size !== '-' ? it.size : '';
     html += `<div class="cart-item">
