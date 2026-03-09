@@ -337,21 +337,21 @@ const INLINE_CATEGORIES = [
   { id: 5, name: 'Аксессуары', emoji: '👜' },
 ];
 const INLINE_PRODUCTS = [
-  { id: 1, category_id: 1, name: 'Белая базовая футболка', price: 1290, sizes: 'S,M,L,XL' },
-  { id: 2, category_id: 1, name: 'Чёрная футболка оверсайз', price: 1590, sizes: 'S,M,L,XL,XXL' },
-  { id: 3, category_id: 1, name: 'Футболка с принтом', price: 1890, sizes: 'S,M,L,XL' },
-  { id: 4, category_id: 2, name: 'Худи чёрное', price: 3490, sizes: 'S,M,L,XL,XXL' },
-  { id: 5, category_id: 2, name: 'Свитшот свежо-серый', price: 2990, sizes: 'S,M,L,XL' },
-  { id: 6, category_id: 2, name: 'Худи бежевое', price: 3990, sizes: 'M,L,XL' },
-  { id: 7, category_id: 3, name: 'Джинсы беги', price: 4590, sizes: '28,30,32,34,36' },
-  { id: 8, category_id: 3, name: 'Джинсы slim чёрные', price: 4990, sizes: '28,30,32,34,36' },
-  { id: 9, category_id: 3, name: 'Брюки карго хаки', price: 3990, sizes: 'S,M,L,XL' },
-  { id: 10, category_id: 4, name: 'Платье льняное', price: 4290, sizes: 'S,M,L' },
-  { id: 11, category_id: 4, name: 'Платье макси чёрное', price: 5490, sizes: 'S,M,L,XL' },
-  { id: 12, category_id: 4, name: 'Юбка плиссе', price: 2590, sizes: 'S,M,L' },
-  { id: 13, category_id: 5, name: 'Кожаная сумка', price: 5990, sizes: '-' },
-  { id: 14, category_id: 5, name: 'Шарф шерстяной', price: 1890, sizes: '-' },
-  { id: 15, category_id: 5, name: 'Кепка бейсболка', price: 990, sizes: '-' },
+  { id: 1, category_id: 1, name: 'Белая базовая футболка', description: 'Хлопок, базовый крой.', price: 1290, sizes: 'S,M,L,XL' },
+  { id: 2, category_id: 1, name: 'Чёрная футболка оверсайз', description: 'Свободный крой, плотный трикотаж.', price: 1590, sizes: 'S,M,L,XL,XXL' },
+  { id: 3, category_id: 1, name: 'Футболка с принтом', description: 'Яркий принт, хлопок.', price: 1890, sizes: 'S,M,L,XL' },
+  { id: 4, category_id: 2, name: 'Худи чёрное', description: 'С капюшоном и карманом-кенгуру.', price: 3490, sizes: 'S,M,L,XL,XXL' },
+  { id: 5, category_id: 2, name: 'Свитшот свежо-серый', description: 'Без капюшона, мягкий.', price: 2990, sizes: 'S,M,L,XL' },
+  { id: 6, category_id: 2, name: 'Худи бежевое', description: 'Оверсайз, утеплённое.', price: 3990, sizes: 'M,L,XL' },
+  { id: 7, category_id: 3, name: 'Джинсы беги', description: 'Свободный крой, деним.', price: 4590, sizes: '28,30,32,34,36' },
+  { id: 8, category_id: 3, name: 'Джинсы slim чёрные', description: 'Зауженный крой, эластичный.', price: 4990, sizes: '28,30,32,34,36' },
+  { id: 9, category_id: 3, name: 'Брюки карго хаки', description: 'С карманами, прочная ткань.', price: 3990, sizes: 'S,M,L,XL' },
+  { id: 10, category_id: 4, name: 'Платье льняное', description: 'Натуральный лён, свободный крой.', price: 4290, sizes: 'S,M,L' },
+  { id: 11, category_id: 4, name: 'Платье макси чёрное', description: 'Длинное, элегантное.', price: 5490, sizes: 'S,M,L,XL' },
+  { id: 12, category_id: 4, name: 'Юбка плиссе', description: 'Лёгкая, до колена.', price: 2590, sizes: 'S,M,L' },
+  { id: 13, category_id: 5, name: 'Кожаная сумка', description: 'Вместительная, минималистичная.', price: 5990, sizes: '-' },
+  { id: 14, category_id: 5, name: 'Шарф шерстяной', description: 'Тёплый, вязаный.', price: 1890, sizes: '-' },
+  { id: 15, category_id: 5, name: 'Кепка бейсболка', description: 'Хлопок, регулируемый размер.', price: 990, sizes: '-' },
 ];
 
 // ─── Init ────────────────────────────────────────────────────────────
@@ -503,6 +503,7 @@ function renderProductModal() {
     `<div class="detail-body">
       <div class="detail-name">${esc(p.name)}</div>
       <div class="detail-price">${fmtPrice(p.price)} ₽</div>
+      ${p.description ? `<div class="detail-desc">${esc(p.description)}</div>` : ''}
       ${sizesHtml}
       <button class="add-btn" id="addToCartBtn" ${sizes.length > 0 ? 'disabled' : ''}>${sizes.length > 0 ? 'Выберите размер' : '🛒 В корзину'}</button>
     </div>`;
