@@ -328,10 +328,38 @@ let searchTimeout = null;
 let currentProduct = null;
 let selectedSize = '';
 
+// ─── Inline catalog data (loads instantly, no API needed) ────────────
+const INLINE_CATEGORIES = [
+  { id: 1, name: 'Футболки', emoji: '👕' },
+  { id: 2, name: 'Худи и свитшоты', emoji: '🧥' },
+  { id: 3, name: 'Джинсы и брюки', emoji: '👖' },
+  { id: 4, name: 'Платья и юбки', emoji: '👗' },
+  { id: 5, name: 'Аксессуары', emoji: '👜' },
+];
+const INLINE_PRODUCTS = [
+  { id: 1, category_id: 1, name: 'Белая базовая футболка', description: 'Мягкий хлопок 100%, классический крой. Идеальная основа для любого образа.', price: 1290, sizes: 'S,M,L,XL', photo_url: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&q=70', has_photo: true },
+  { id: 2, category_id: 1, name: 'Чёрная футболка oversize', description: 'Удлинённый крой, плотный трикотаж. Стильная повседневная классика.', price: 1590, sizes: 'S,M,L,XL,XXL', photo_url: 'https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?w=300&q=70', has_photo: true },
+  { id: 3, category_id: 1, name: 'Футболка с принтом', description: 'Яркий дизайнерский принт, хлопок с эластаном. Не линяет после стирки.', price: 1890, sizes: 'S,M,L,XL', photo_url: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=300&q=70', has_photo: true },
+  { id: 4, category_id: 2, name: 'Худи чёрное классик', description: 'Тёплое худи с капюшоном и карманом-кенгуру. Флис внутри.', price: 3490, sizes: 'S,M,L,XL,XXL', photo_url: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=300&q=70', has_photo: true },
+  { id: 5, category_id: 2, name: 'Свитшот серый меланж', description: 'Мягкий свитшот без капюшона. Универсальный цвет на каждый день.', price: 2990, sizes: 'S,M,L,XL', photo_url: 'https://images.unsplash.com/photo-1578768079470-4cf531ea7994?w=300&q=70', has_photo: true },
+  { id: 6, category_id: 2, name: 'Худи бежевое oversize', description: 'Оверсайз крой, утеплённое. Уютный вариант для прохладной погоды.', price: 3990, sizes: 'M,L,XL', photo_url: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=300&q=70', has_photo: true },
+  { id: 7, category_id: 3, name: 'Джинсы прямого кроя', description: 'Классические синие джинсы, плотный деним. Не вытягиваются.', price: 4590, sizes: '28,30,32,34,36', photo_url: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=300&q=70', has_photo: true },
+  { id: 8, category_id: 3, name: 'Джинсы slim fit чёрные', description: 'Зауженный крой, эластичный деним. Современная посадка.', price: 4990, sizes: '28,30,32,34,36', photo_url: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=300&q=70', has_photo: true },
+  { id: 9, category_id: 3, name: 'Брюки карго хаки', description: 'Свободный крой с карманами. Прочная ткань для активного стиля.', price: 3990, sizes: 'S,M,L,XL', photo_url: 'https://images.unsplash.com/photo-1517438476312-10d79c077509?w=300&q=70', has_photo: true },
+  { id: 10, category_id: 4, name: 'Платье-миди льняное', description: 'Натуральный лён, свободный крой. Идеально на лето.', price: 4290, sizes: 'S,M,L', photo_url: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300&q=70', has_photo: true },
+  { id: 11, category_id: 4, name: 'Платье макси чёрное', description: 'Элегантное длинное платье для особых случаев.', price: 5490, sizes: 'S,M,L,XL', photo_url: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=300&q=70', has_photo: true },
+  { id: 12, category_id: 4, name: 'Юбка плиссе', description: 'Плиссированная юбка до колена, лёгкая ткань.', price: 2590, sizes: 'S,M,L', photo_url: 'https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?w=300&q=70', has_photo: true },
+  { id: 13, category_id: 5, name: 'Кожаная сумка-шоппер', description: 'Вместительная сумка из натуральной кожи. Минималистичный дизайн.', price: 5990, sizes: '-', photo_url: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=300&q=70', has_photo: true },
+  { id: 14, category_id: 5, name: 'Шерстяной шарф', description: 'Мягкий вязаный шарф, тёплый и уютный.', price: 1890, sizes: '-', photo_url: 'https://images.unsplash.com/photo-1520903920243-00d872a2d1c9?w=300&q=70', has_photo: true },
+  { id: 15, category_id: 5, name: 'Кепка бейсболка', description: 'Хлопковая кепка с регулировкой размера.', price: 990, sizes: '-', photo_url: 'https://images.unsplash.com/photo-1588850561407-ed78c334e67a?w=300&q=70', has_photo: true },
+];
+
 // ─── Init ────────────────────────────────────────────────────────────
 applyTheme();
-loadCategories();
-loadProducts();
+categories = INLINE_CATEGORIES;
+renderChips();
+products = INLINE_PRODUCTS;
+renderGrid();
 if (uid) loadCart();
 
 // ─── Theme ───────────────────────────────────────────────────────────
@@ -354,24 +382,20 @@ async function api(path, opts) {
   return r.json();
 }
 
-async function loadCategories() {
-  const d = await api('/api/categories');
-  if (d.ok) { categories = d.categories; renderChips(); }
+function loadProducts(catId, query) {
+  let filtered = INLINE_PRODUCTS;
+  if (catId) filtered = filtered.filter(p => p.category_id === catId);
+  if (query) {
+    const q = query.toLowerCase();
+    filtered = filtered.filter(p => p.name.toLowerCase().includes(q) || (p.description || '').toLowerCase().includes(q));
+  }
+  products = filtered;
+  renderGrid();
 }
 
-async function loadProducts(catId, query) {
-  const el = document.getElementById('content');
-  el.innerHTML = '<div class="spinner"></div>';
-  const params = new URLSearchParams();
-  if (catId) params.set('cat', catId);
-  if (query) params.set('q', query);
-  const d = await api('/api/products?' + params);
-  if (d.ok) { products = d.products; renderGrid(); }
-}
-
-async function loadProduct(id) {
-  const d = await api('/api/product/' + id);
-  if (d.ok) { currentProduct = d.product; renderProductModal(); openModal('product'); }
+function loadProduct(id) {
+  const p = INLINE_PRODUCTS.find(x => x.id === Number(id));
+  if (p) { currentProduct = p; renderProductModal(); openModal('product'); }
 }
 
 async function loadCart() {
