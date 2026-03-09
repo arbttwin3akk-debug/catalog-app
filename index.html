@@ -157,7 +157,7 @@
     .detail-body { padding: 16px 20px 32px; }
     .detail-name { font-size: 20px; font-weight: 700; }
     .detail-price { font-size: 22px; font-weight: 800; color: var(--accent); margin-top: 6px; }
-    .detail-desc { font-size: 14px; color: var(--hint); margin-top: 10px; line-height: 1.5; }
+    .detail-desc { font-size: 14px; color: var(--text); opacity: 0.85; margin-top: 10px; line-height: 1.5; display: block; }
     .detail-section { margin-top: 16px; }
     .detail-label { font-size: 12px; font-weight: 700; color: var(--hint); text-transform: uppercase; margin-bottom: 8px; }
     .sizes { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -499,11 +499,12 @@ function renderProductModal() {
     sizesHtml = `<div class="detail-section"><div class="detail-label">Размер</div><div class="sizes">${sizes.map(s => `<div class="size-btn" data-size="${esc(s)}">${esc(s)}</div>`).join('')}</div></div>`;
   }
 
+  const descHtml = (p.description && String(p.description).trim()) ? `<div class="detail-desc">${esc(p.description)}</div>` : '';
   document.getElementById('productContent').innerHTML =
     `<div class="detail-body">
       <div class="detail-name">${esc(p.name)}</div>
       <div class="detail-price">${fmtPrice(p.price)} ₽</div>
-      ${p.description ? `<div class="detail-desc">${esc(p.description)}</div>` : ''}
+      ${descHtml}
       ${sizesHtml}
       <button class="add-btn" id="addToCartBtn" ${sizes.length > 0 ? 'disabled' : ''}>${sizes.length > 0 ? 'Выберите размер' : '🛒 В корзину'}</button>
     </div>`;
