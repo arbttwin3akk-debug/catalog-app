@@ -99,7 +99,7 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 48px; color: #fff;
     }
-    .card-body { padding: 10px 12px 12px; }
+    .card-body { padding: 16px 14px; }
     .card-name {
       font-size: 13px; font-weight: 600;
       line-height: 1.3; display: -webkit-box;
@@ -337,21 +337,21 @@ const INLINE_CATEGORIES = [
   { id: 5, name: 'Аксессуары', emoji: '👜' },
 ];
 const INLINE_PRODUCTS = [
-  { id: 1, category_id: 1, name: 'Белая базовая футболка', description: 'Мягкий хлопок 100%, классический крой. Идеальная основа для любого образа.', price: 1290, sizes: 'S,M,L,XL', photo_url: 'photos/tshirt_white.jpg?v=5', has_photo: true },
-  { id: 2, category_id: 1, name: 'Чёрная футболка oversize', description: 'Удлинённый крой, плотный трикотаж. Стильная повседневная классика.', price: 1590, sizes: 'S,M,L,XL,XXL', photo_url: 'photos/tshirt_black.jpg?v=5', has_photo: true },
-  { id: 3, category_id: 1, name: 'Футболка с принтом', description: 'Яркий дизайнерский принт, хлопок с эластаном. Не линяет после стирки.', price: 1890, sizes: 'S,M,L,XL', photo_url: 'photos/tshirt_print.jpg?v=5', has_photo: true },
-  { id: 4, category_id: 2, name: 'Худи чёрное классик', description: 'Тёплое худи с капюшоном и карманом-кенгуру. Флис внутри.', price: 3490, sizes: 'S,M,L,XL,XXL', photo_url: 'photos/hoodie_black.jpg?v=5', has_photo: true },
-  { id: 5, category_id: 2, name: 'Свитшот серый меланж', description: 'Мягкий свитшот без капюшона. Универсальный цвет на каждый день.', price: 2990, sizes: 'S,M,L,XL', photo_url: 'photos/sweatshirt_grey.jpg?v=5', has_photo: true },
-  { id: 6, category_id: 2, name: 'Худи бежевое oversize', description: 'Оверсайз крой, утеплённое. Уютный вариант для прохладной погоды.', price: 3990, sizes: 'M,L,XL', photo_url: 'photos/hoodie_beige.jpg?v=5', has_photo: true },
-  { id: 7, category_id: 3, name: 'Джинсы прямого кроя', description: 'Классические синие джинсы, плотный деним. Не вытягиваются.', price: 4590, sizes: '28,30,32,34,36', photo_url: 'photos/jeans_straight.jpg?v=5', has_photo: true },
-  { id: 8, category_id: 3, name: 'Джинсы slim fit чёрные', description: 'Зауженный крой, эластичный деним. Современная посадка.', price: 4990, sizes: '28,30,32,34,36', photo_url: 'photos/jeans_black.jpg?v=5', has_photo: true },
-  { id: 9, category_id: 3, name: 'Брюки карго хаки', description: 'Свободный крой с карманами. Прочная ткань для активного стиля.', price: 3990, sizes: 'S,M,L,XL', photo_url: 'photos/cargo_pants.jpg?v=5', has_photo: true },
-  { id: 10, category_id: 4, name: 'Платье-миди льняное', description: 'Натуральный лён, свободный крой. Идеально на лето.', price: 4290, sizes: 'S,M,L', photo_url: 'photos/dress_midi.jpg?v=5', has_photo: true },
-  { id: 11, category_id: 4, name: 'Платье макси чёрное', description: 'Элегантное длинное платье для особых случаев.', price: 5490, sizes: 'S,M,L,XL', photo_url: 'photos/dress_maxi.jpg?v=5', has_photo: true },
-  { id: 12, category_id: 4, name: 'Юбка плиссе', description: 'Плиссированная юбка до колена, лёгкая ткань.', price: 2590, sizes: 'S,M,L', photo_url: 'photos/skirt_plisse.jpg?v=5', has_photo: true },
-  { id: 13, category_id: 5, name: 'Кожаная сумка-шоппер', description: 'Вместительная сумка из натуральной кожи. Минималистичный дизайн.', price: 5990, sizes: '-', photo_url: 'photos/bag_shopper.jpg?v=5', has_photo: true },
-  { id: 14, category_id: 5, name: 'Шерстяной шарф', description: 'Мягкий вязаный шарф, тёплый и уютный.', price: 1890, sizes: '-', photo_url: 'photos/scarf_wool.jpg?v=5', has_photo: true },
-  { id: 15, category_id: 5, name: 'Кепка бейсболка', description: 'Хлопковая кепка с регулировкой размера.', price: 990, sizes: '-', photo_url: 'photos/cap_baseball.jpg?v=5', has_photo: true },
+  { id: 1, category_id: 1, name: 'Белая базовая футболка', price: 1290, sizes: 'S,M,L,XL' },
+  { id: 2, category_id: 1, name: 'Чёрная футболка оверсайз', price: 1590, sizes: 'S,M,L,XL,XXL' },
+  { id: 3, category_id: 1, name: 'Футболка с принтом', price: 1890, sizes: 'S,M,L,XL' },
+  { id: 4, category_id: 2, name: 'Худи чёрное', price: 3490, sizes: 'S,M,L,XL,XXL' },
+  { id: 5, category_id: 2, name: 'Свитшот свежо-серый', price: 2990, sizes: 'S,M,L,XL' },
+  { id: 6, category_id: 2, name: 'Худи бежевое', price: 3990, sizes: 'M,L,XL' },
+  { id: 7, category_id: 3, name: 'Джинсы широкие', price: 4590, sizes: '28,30,32,34,36' },
+  { id: 8, category_id: 3, name: 'Джинсы slim чёрные', price: 4990, sizes: '28,30,32,34,36' },
+  { id: 9, category_id: 3, name: 'Брюки карго хаки', price: 3990, sizes: 'S,M,L,XL' },
+  { id: 10, category_id: 4, name: 'Платье-миди льняное', price: 4290, sizes: 'S,M,L' },
+  { id: 11, category_id: 4, name: 'Платье макси чёрное', price: 5490, sizes: 'S,M,L,XL' },
+  { id: 12, category_id: 4, name: 'Юбка плиссе', price: 2590, sizes: 'S,M,L' },
+  { id: 13, category_id: 5, name: 'Сумка-шоппер', price: 5990, sizes: '-' },
+  { id: 14, category_id: 5, name: 'Шарф шерстяной', price: 1890, sizes: '-' },
+  { id: 15, category_id: 5, name: 'Кепка бейсболка', price: 990, sizes: '-' },
 ];
 
 // ─── Init ────────────────────────────────────────────────────────────
@@ -477,10 +477,7 @@ function renderGrid() {
   }
   let html = '<div class="grid">';
   for (const p of products) {
-    const img = p.photo_url
-      ? `<img class="card-img" src="${p.photo_url}" alt="" loading="lazy">`
-      : `<div class="card-placeholder">👔</div>`;
-    html += `<div class="card" data-id="${p.id}">${img}<div class="card-body"><div class="card-name">${esc(p.name)}</div><div class="card-price">${fmtPrice(p.price)} ₽</div></div></div>`;
+    html += `<div class="card" data-id="${p.id}"><div class="card-body"><div class="card-name">${esc(p.name)}</div><div class="card-price">${fmtPrice(p.price)} ₽</div></div></div>`;
   }
   html += '</div>';
   el.innerHTML = html;
@@ -496,10 +493,6 @@ function renderProductModal() {
   const p = currentProduct;
   if (!p) return;
   selectedSize = '';
-  const img = p.photo_url
-    ? `<img class="detail-img" src="${p.photo_url}" alt="">`
-    : `<div class="detail-placeholder">👔</div>`;
-
   const sizes = (p.sizes || '').split(',').map(s => s.trim()).filter(Boolean);
   let sizesHtml = '';
   if (sizes.length > 0) {
@@ -507,11 +500,9 @@ function renderProductModal() {
   }
 
   document.getElementById('productContent').innerHTML =
-    `${img}
-    <div class="detail-body">
+    `<div class="detail-body">
       <div class="detail-name">${esc(p.name)}</div>
       <div class="detail-price">${fmtPrice(p.price)} ₽</div>
-      ${p.description ? `<div class="detail-desc">${esc(p.description)}</div>` : ''}
       ${sizesHtml}
       <button class="add-btn" id="addToCartBtn" ${sizes.length > 0 ? 'disabled' : ''}>${sizes.length > 0 ? 'Выберите размер' : '🛒 В корзину'}</button>
     </div>`;
@@ -547,12 +538,8 @@ function renderCartModal() {
   for (const it of cart) {
     const sub = it.price * it.quantity;
     total += sub;
-    const img = it.photo_url
-      ? `<img class="cart-item-img" src="${it.photo_url}" alt="">`
-      : `<div class="cart-item-placeholder">👔</div>`;
     const sizeLabel = it.size && it.size !== '-' ? it.size : '';
     html += `<div class="cart-item">
-      ${img}
       <div class="cart-item-info">
         <div class="cart-item-name">${esc(it.name)}</div>
         ${sizeLabel ? `<div class="cart-item-size">${esc(sizeLabel)}</div>` : ''}
