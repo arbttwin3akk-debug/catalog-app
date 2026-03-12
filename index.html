@@ -400,20 +400,34 @@ function loadProduct(id) {
 
 async function loadCart() {
   if (!uid) return;
-  const d = await api('/api/cart/' + uid);
-  if (d.ok) { cart = d.items || []; updateCartUI(); }
+  try {
+    const d = await api('/api/cart/' + uid);
+    if (d.ok) {
+      cart = (d.items || []).map(it => {
+        const prod = INLINE_PRODUCTS.find(p => p.id === it.product_id);
+        return { ...it, name: it.name || prod?.name, price: it.price ?? prod?.price };
+      });
+      updateCartUI();
+    }
+  } catch (e) { console.error('Cart load error', e); }
 }
 
-async function apiCartAdd(productId, size) {
-  if (!uid) return;
-  await api('/api/cart/add', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ uid, product_id: productId, size }),
-  });
-  await loadCart();
-  showToast('Добавлено в корзину');
-  if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+async function apiCartAdd(productId, size, productName, productPrice) {
+  if (!uid) { showToast('Войдите через бота'); return; }
+  if (!API) { showToast('Откройте каталог через бота'); return; }
+  const prod = productName != null ? { name: productName, price: productPrice } : INLINE_PRODUCTS.find(p => p.id === productId);
+  try {
+    const d = await api('/api/cart/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ uid, product_id: productId, size, product_name: prod?.name, price: prod?.price }),
+    });
+    if (d && !d.error) {
+      await loadCart();
+      showToast('Добавлено в корзину');
+      if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+    } else { showToast('Ошибка. Попробуйте ещё раз'); }
+  } catch (e) { console.error(e); showToast('Ошибка соединения'); }
 }
 
 async function apiCartUpdate(itemId, qty) {
@@ -523,7 +537,7 @@ document.getElementById('productModal').addEventListener('click', e => {
   }
   if (e.target.id === 'addToCartBtn' && !e.target.disabled && currentProduct) {
     const size = selectedSize || '-';
-    apiCartAdd(currentProduct.id, size);
+    apiCartAdd(currentProduct.id, size, currentProduct.name, currentProduct.price);
     closeModals();
   }
 });
