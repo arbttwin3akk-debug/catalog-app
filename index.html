@@ -617,6 +617,26 @@ document.getElementById('cartContent').addEventListener('click', e => {
   }
 });
 
+// ─── Phone mask: +7 (XXX) XXX-XX-XX ───────────────────────────────────
+function formatPhoneInput(e) {
+  const input = e.target;
+  let v = input.value.replace(/\D/g, '');
+  if (v.startsWith('8')) v = v.slice(1);
+  if (v.startsWith('7')) v = v.slice(1);
+  v = v.slice(0, 10);
+  let out = '+7';
+  if (v.length > 0) out += ' (' + v.slice(0, 3);
+  if (v.length >= 3) out += ') ' + v.slice(3, 6);
+  if (v.length >= 6) out += '-' + v.slice(6, 8);
+  if (v.length >= 8) out += '-' + v.slice(8, 10);
+  input.value = out;
+}
+
+function getPhoneDigits(el) {
+  const v = (el?.value || '').replace(/\D/g, '');
+  return v.startsWith('7') ? v : '7' + v;
+}
+
 // ─── Render: checkout form ───────────────────────────────────────────
 function renderCheckoutForm() {
   const el = document.getElementById('cartContent');
@@ -626,20 +646,29 @@ function renderCheckoutForm() {
     <div class="cart-title">Оформление</div>
     <div class="cart-body">
       <div class="form-group"><label>Имя</label><input id="coName" placeholder="Ваше имя"></div>
-      <div class="form-group"><label>Телефон</label><input id="coPhone" type="tel" placeholder="+7 (999) 123-45-67"></div>
-      <div class="form-group"><label>Адрес доставки</label><input id="coAddr" placeholder="Город, улица, дом, кв."></div>
+      <div class="form-group"><label>Телефон</label><input id="coPhone" type="tel" placeholder="+7 (___) ___-__-__" maxlength="18" value="+7 "></div>
+      <div class="form-group"><label>Г</label><input id="coCity" placeholder="Москва"></div>
+      <div class="form-group"><label>ул</label><input id="coStreet" placeholder="Ленина, 10"></div>
       <div class="cart-total"><span>Итого</span><span>${fmtPrice(total)} ₽</span></div>
       <button class="checkout-btn" id="placeOrderBtn">Подтвердить заказ</button>
     </div>`;
+  const ph = document.getElementById('coPhone');
+  if (ph) { ph.addEventListener('input', formatPhoneInput); ph.addEventListener('focus', () => { if (ph.value === '') ph.value = '+7 '; }); }
 }
 
 document.getElementById('cartContent').addEventListener('click', e => {
   if (e.target.id === 'placeOrderBtn') {
     const name = document.getElementById('coName').value.trim();
-    const phone = document.getElementById('coPhone').value.trim();
-    const addr = document.getElementById('coAddr').value.trim();
-    if (!name || !phone) { showToast('Заполните имя и телефон'); return; }
-    apiPlaceOrder(name, phone, addr);
+    const phoneEl = document.getElementById('coPhone');
+    const city = document.getElementById('coCity').value.trim();
+    const street = document.getElementById('coStreet').value.trim();
+    const phoneFormatted = phoneEl?.value || '';
+    const phoneDigits = getPhoneDigits(phoneEl);
+    const addr = [city && `Г ${city}`, street && `ул ${street}`].filter(Boolean).join(', ');
+    if (!name) { showToast('Заполните имя'); return; }
+    if (phoneDigits.length < 11) { showToast('Введите номер телефона'); return; }
+    if (!addr) { showToast('Введите адрес (город и улицу)'); return; }
+    apiPlaceOrder(name, phoneFormatted, addr);
   }
 });
 
