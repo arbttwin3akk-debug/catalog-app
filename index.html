@@ -317,8 +317,9 @@ const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); }
 
 const params = new URLSearchParams(location.search);
-const API = (params.get('api') || '').replace(/\/$/, '');
-let uid = tg?.initDataUnsafe?.user?.id || params.get('uid') || 0;
+const API_BASE = 'https://catalog-bot.from1xtru.workers.dev';
+const API = (params.get('api') || tg?.initDataUnsafe?.start_param?.match(/api=([^&]+)/)?.[1] || API_BASE).replace(/\/$/, '');
+let uid = Number(tg?.initDataUnsafe?.user?.id || params.get('uid') || 0);
 
 let categories = [];
 let products = [];
@@ -378,8 +379,9 @@ function applyTheme() {
 
 // ─── API calls ───────────────────────────────────────────────────────
 async function api(path, opts) {
-  const r = await fetch(API + path, opts);
-  return r.json();
+  const r = await fetch(API + path, { mode: 'cors', ...opts });
+  const text = await r.text();
+  try { return JSON.parse(text); } catch { return { ok: false, error: 'Invalid response' }; }
 }
 
 function loadProducts(catId, query) {
@@ -413,21 +415,36 @@ async function loadCart() {
 }
 
 async function apiCartAdd(productId, size, productName, productPrice) {
-  if (!uid) { showToast('Войдите через бота'); return; }
-  if (!API) { showToast('Откройте каталог через бота'); return; }
+  if (!uid) { showToast('Откройте каталог через кнопку бота'); return; }
   const prod = productName != null ? { name: productName, price: productPrice } : INLINE_PRODUCTS.find(p => p.id === productId);
+  if (!prod) return;
+  const sizeVal = size || '-';
+  const newItem = { id: 'tmp_' + Date.now(), product_id: productId, name: prod.name, price: prod.price, size: sizeVal, quantity: 1 };
+  const existing = cart.find(i => i.product_id === productId && (i.size || '-') === sizeVal);
+  if (existing) {
+    existing.quantity++;
+  } else {
+    cart.push(newItem);
+  }
+  updateCartUI();
+  showToast('Добавлено в корзину');
+  if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+  closeModals();
   try {
     const d = await api('/api/cart/add', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ uid, product_id: productId, size, product_name: prod?.name, price: prod?.price }),
+      body: JSON.stringify({ uid: Number(uid), product_id: Number(productId), size: sizeVal, product_name: prod.name, price: prod.price }),
     });
-    if (d && !d.error) {
+    if (d && d.ok !== false && !d.error) {
       await loadCart();
-      showToast('Добавлено в корзину');
-      if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-    } else { showToast('Ошибка. Попробуйте ещё раз'); }
-  } catch (e) { console.error(e); showToast('Ошибка соединения'); }
+    } else {
+      showToast(d?.error || d?.message || 'Сервер не ответил — корзина сохранена локально');
+    }
+  } catch (e) {
+    console.error('Cart API error:', e);
+    showToast('Нет связи с сервером — товар в корзине до оформления');
+  }
 }
 
 async function apiCartUpdate(itemId, qty) {
@@ -577,14 +594,22 @@ function renderCartModal() {
 document.getElementById('cartContent').addEventListener('click', e => {
   const qtyBtn = e.target.closest('.qty-btn');
   if (qtyBtn) {
-    const id = Number(qtyBtn.dataset.item);
+    const id = qtyBtn.dataset.item;
+    const idNum = String(id).startsWith('tmp_') ? id : Number(id);
     const action = qtyBtn.dataset.action;
-    const item = cart.find(i => i.id === id);
+    const item = cart.find(i => String(i.id) === String(id));
     if (!item) return;
-    if (action === 'inc') apiCartUpdate(id, item.quantity + 1);
-    else if (action === 'dec') {
-      if (item.quantity <= 1) apiCartRemove(id);
-      else apiCartUpdate(id, item.quantity - 1);
+    if (String(item.id).startsWith('tmp_')) {
+      if (action === 'inc') item.quantity++;
+      else if (action === 'dec') { if (item.quantity <= 1) cart = cart.filter(x => x !== item); else item.quantity--; }
+      updateCartUI();
+      renderCartModal();
+    } else {
+      if (action === 'inc') apiCartUpdate(idNum, item.quantity + 1);
+      else if (action === 'dec') {
+        if (item.quantity <= 1) apiCartRemove(idNum);
+        else apiCartUpdate(idNum, item.quantity - 1);
+      }
     }
   }
   if (e.target.id === 'checkoutBtn') {
@@ -617,6 +642,26 @@ document.getElementById('cartContent').addEventListener('click', e => {
     apiPlaceOrder(name, phone, addr);
   }
 });
+
+async function syncLocalCartToServer() {
+  const tmpItems = cart.filter(i => String(i.id).startsWith('tmp_'));
+  for (const it of tmpItems) {
+    try {
+      const d = await api('/api/cart/add', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uid: Number(uid), product_id: it.product_id, size: it.size || '-', product_name: it.name, price: it.price }),
+      });
+      if (d && d.ok !== false) {
+        for (let q = 1; q < it.quantity; q++) {
+          await api('/api/cart/add', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ uid: Number(uid), product_id: it.product_id, size: it.size || '-', product_name: it.name, price: it.price }) });
+        }
+      }
+    } catch (_) { return false; }
+  }
+  await loadCart();
+  return true;
+}
 
 function renderOrderSuccess(orderId) {
   document.getElementById('cartContent').innerHTML = `
