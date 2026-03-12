@@ -473,11 +473,13 @@ async function apiPlaceOrder(name, phone, address) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ uid, name, phone, address }),
   });
-  if (d.ok) {
+  if (d?.ok) {
     cart = [];
     updateCartUI();
     renderOrderSuccess(d.order_id);
+    return true;
   }
+  return false;
 }
 
 // ─── Render: chips ───────────────────────────────────────────────────
@@ -656,39 +658,47 @@ function renderCheckoutForm() {
   if (ph) { ph.addEventListener('input', formatPhoneInput); ph.addEventListener('focus', () => { if (ph.value === '') ph.value = '+7 '; }); }
 }
 
-document.getElementById('cartContent').addEventListener('click', e => {
-  if (e.target.id === 'placeOrderBtn') {
-    const name = document.getElementById('coName').value.trim();
-    const phoneEl = document.getElementById('coPhone');
-    const city = document.getElementById('coCity').value.trim();
-    const street = document.getElementById('coStreet').value.trim();
-    const phoneFormatted = phoneEl?.value || '';
-    const phoneDigits = getPhoneDigits(phoneEl);
-    const addr = [city && `Г ${city}`, street && `ул ${street}`].filter(Boolean).join(', ');
-    if (!name) { showToast('Заполните имя'); return; }
-    if (phoneDigits.length < 11) { showToast('Введите номер телефона'); return; }
-    if (!addr) { showToast('Введите адрес (город и улицу)'); return; }
-    apiPlaceOrder(name, phoneFormatted, addr);
+document.getElementById('cartContent').addEventListener('click', async e => {
+  if (e.target.id !== 'placeOrderBtn') return;
+  const btn = e.target;
+  const name = document.getElementById('coName').value.trim();
+  const phoneEl = document.getElementById('coPhone');
+  const city = document.getElementById('coCity').value.trim();
+  const street = document.getElementById('coStreet').value.trim();
+  const phoneFormatted = phoneEl?.value || '';
+  const phoneDigits = getPhoneDigits(phoneEl);
+  const addr = [city && `Г ${city}`, street && `ул ${street}`].filter(Boolean).join(', ');
+  if (!name) { showToast('Заполните имя'); return; }
+  if (phoneDigits.length < 11) { showToast('Введите номер телефона'); return; }
+  if (!addr) { showToast('Введите адрес (город и улицу)'); return; }
+  btn.disabled = true;
+  btn.textContent = 'Оформление...';
+  try {
+    const ok = await syncLocalCartToServer();
+    if (!ok && cart.some(i => String(i.id).startsWith('tmp_'))) { showToast('Нет связи. Попробуйте позже'); return; }
+    const placed = await apiPlaceOrder(name, phoneFormatted, addr);
+    if (!placed) showToast('Ошибка. Попробуйте ещё раз');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Подтвердить заказ';
   }
 });
 
 async function syncLocalCartToServer() {
   const tmpItems = cart.filter(i => String(i.id).startsWith('tmp_'));
-  for (const it of tmpItems) {
-    try {
-      const d = await api('/api/cart/add', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ uid: Number(uid), product_id: it.product_id, size: it.size || '-', product_name: it.name, price: it.price }),
-      });
-      if (d && d.ok !== false) {
-        for (let q = 1; q < it.quantity; q++) {
-          await api('/api/cart/add', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ uid: Number(uid), product_id: it.product_id, size: it.size || '-', product_name: it.name, price: it.price }) });
-        }
-      }
-    } catch (_) { return false; }
-  }
-  await loadCart();
+  if (tmpItems.length === 0) return true;
+  try {
+    const items = tmpItems.map(it => ({
+      product_id: it.product_id,
+      size: it.size || '-',
+      product_name: it.name,
+      price: it.price,
+      quantity: it.quantity,
+    }));
+    const d = await api('/api/cart/sync', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ uid: Number(uid), items }) });
+    if (!d?.ok) return false;
+    await loadCart();
+  } catch (_) { return false; }
   return true;
 }
 
